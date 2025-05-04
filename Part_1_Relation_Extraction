@@ -1,63 +1,9 @@
-# Key Concepts in Relation Extraction (RE)
+# Part 1 – Relation Extraction (RE)
 
-## Relation Extraction as a Core Step Beyond NER
+Relation extraction (RE) extends named entity recognition (NER) by focusing on the semantic relationships between entities rather than simply identifying mentions. By labeling edges—such as `employed_by` between two entity mentions—RE constructs richly interconnected graphs that capture meaningful relationships across text. **Mention‑level RE** determines whether a relation holds in a specific sentence, while **global RE** aggregates evidence across multiple contexts to infer more precise or specialized links. An underlying **ontology** defines valid entity–relation pairs (for example, restricting `employed_by` to connect a `PERSON` with an `ORGANIZATION`), ensuring consistency and precision in knowledge base construction.
 
-Relation extraction (RE) represents a crucial step beyond named entity recognition (NER) by not only identifying entities—such as people or organizations—but also the semantic links between them. While NER might flag “Hardy” and “Calmet Corporation” as distinct nodes in a knowledge graph, RE labels the relationship—`employed_by`, for example—creating the edges that give the graph its structure.
+RE pipelines often leverage **kernel methods**, such as syntactic tree kernels that exploit dependency parse structures; one dynamic tree‑span kernel achieved a 77.1 % F‑score on standard benchmarks, outperforming simpler classifiers by several percentage points. To scale beyond limited annotated data, **semi‑supervised techniques** like bootstrapping iteratively learn new relation patterns from seed examples, while **distant supervision** uses existing knowledge bases (e.g., DBpedia) to automatically label sentences across large corpora, trading some precision for coverage. **Multitask transfer learning** further improves performance for low‑resource relations by sharing syntactic representations across related tasks.
 
-## Mention-Level vs. Global RE
+RE enables **graph connectivity** in knowledge base construction, inferring edges such as `part_of`, `located_in`, or `related_to` to capture domain‑specific relationships beyond flat tables of entities. It also supports **event extraction**, identifying temporal or causal events—such as acquisitions, product launches, or policy changes—and embedding time‑aware structure into the graph. By integrating with **vector models** (e.g., `pgvector`), symbolic edges can be augmented with embedding‑based similarity measures, enabling powerful hybrid retrieval strategies.
 
-- **Mention‑level RE** focuses on determining whether two entities share a specific relation within a single sentence.  
-- **Global RE** aggregates evidence across multiple contexts, allowing the system to generalize from broad relations like `employed_by` to more precise links such as `CEO_of`.
-
-## Ontology‑Driven Constraints
-
-Underpinning RE is an ontology that constrains which entity types may be connected (for instance, only a `PERSON` can be `employed_by` an `ORGANIZATION`), ensuring consistency and precision as the knowledge base grows.
-
----
-
-# Techniques and Evaluation
-
-## Kernel Methods vs. Feature‑Based Models
-
-Syntactic tree kernels, which leverage the structure of dependency parses, have achieved state-of-the-art performance—one dynamic tree‑span kernel reached a 77.1 % F‑score on the ACE 2004 benchmark, roughly 5.5 % higher than simpler lexical and syntactic-feature-based classifiers.
-
-## Semisupervised and Distant Supervision
-
-- **Bootstrapping**  
-  Starts with a small set of seed relations and iteratively learns new patterns.  
-- **Distant Supervision**  
-  Automatically labels text using existing KB facts (e.g., from Wikidata), trading some precision for vast coverage.  
-- **Multitask Transfer Learning**  
-  Shares syntactic representations across related relation types to improve performance in low-resource settings.
-
----
-
-# Advantages of Using RE for a Stock Market Knowledge Base
-
-1. **Enables Graph Connectivity**  
-   By inferring edges such as `subsidiary_of`, `competitor_of`, `merges_with`, or `invests_in`, RE captures real-world business dynamics beyond flat tables of metrics.
-
-2. **Facilitates Event Detection**  
-   Techniques extend naturally to event extraction—identifying earnings announcements, acquisitions, or regulatory scandals—and embed temporal and causal structure into the graph.
-
-3. **Scalable with Distant Supervision**  
-   Leveraging financial sources like Crunchbase or EDGAR filings enables weakly supervised RE pipelines to scale across millions of documents.
-
-4. **Interoperability with Vector Models**  
-   Modern RE can integrate embeddings (e.g., with `pgvector`), blending symbolic relations with vector-based similarity search for powerful retrieval.
-
----
-
-# Disadvantages and Challenges
-
-1. **Complexity and Low Accuracy**  
-   Mention‑level ambiguity, diverse syntactic constructions, and insufficient context often depress precision and recall.
-
-2. **Ontology Constraints**  
-   The system is bounded by the quality and coverage of its underlying ontology, which requires careful design and maintenance.
-
-3. **Error Propagation**  
-   RE follows NER; any misclassified entity (e.g., “Mary” as a location) cascades downstream, undermining relation accuracy.
-
-4. **Training Data Bottleneck**  
-   While bootstrapping and distant supervision reduce annotation needs, they introduce noisy labels that must be filtered or denoised to achieve high-quality training data.
+Despite its capabilities, RE poses challenges: its inherent **complexity**—from mention ambiguity to diverse linguistic expressions—can hinder precision and recall; **ontology constraints** require comprehensive definitions of valid relations and entity types; **error propagation** from upstream NER mistakes can undermine relation accuracy; and while bootstrapping and distant supervision alleviate annotation demands, they introduce noisy labels that necessitate careful denoising and curation.
